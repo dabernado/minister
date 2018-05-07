@@ -1,11 +1,22 @@
-// Should it check for negative words?
+const sentence0 = "We should bring back content time"
+const sentence1 = "Do not bring back content time"
 
-async function evaluate (str, str1) {
+async function compareSolutions (solution0, solution1) {
   let matches = []
   let data = []
-  let regs = await extract(str1)
+  let regs = await extract(solution1)
+  let combos = await doubleWords(data)
+  let contrary0 = checkContrariness(solution0)
+  let contrary1 = checkContrariness(solution1)
+  (contrary0 != contrary1) ? matches.push({juxtaposed: false}) : matches.push({juxtaposed: true})
+  for (let e of combos.phrases) {
+    matches.push({
+      phrase: e,
+      index: combos.indices[combos.phrases.indexOf(e)]
+    })
+  }
   for (let e of regs) {
-    let res = await collect(str.toLowerCase().match(e))
+    let res = await collect(solution0.toLowerCase().match(e))
     if (res) {
       data.push(res)
       matches.push({
@@ -14,18 +25,11 @@ async function evaluate (str, str1) {
       })
     }
   }
-  let combos = await doubleWords(data)
-  for (let e of combos.phrases) {
-    matches.push({
-      phrase: e,
-      index: combos.indices[combos.phrases.indexOf(e)]
-    })
-  }
-  return matches
+  console.log(matches)
 }
 
-async function extract (str) {
-  let words = await str.split(/[ .\-_/'"()]+/)
+async function extract (solution) {
+  let words = await solution.split(/[ .\-_/'"()]+/)
   let regs = []
   for (let e of words) {
     let reg = new RegExp(e)
@@ -63,11 +67,22 @@ function doubleWords (data) {
   return res
 }
 
-async function negative (str, str1) {
+function checkContrariness (solution) {
   let negatives = [
     /dont/,
     /not/,
-    /no/,
-    /stop/
+    /no /,
+    /stop/,
+    /shouldnt/
   ]
+  let contrary = false
+  for (let e in negatives) {
+    let solutionNeg = solution.toLowerCase().match(negatives[e])
+    if (solutionNeg != null) {
+      contrary = true
+    }
+  }
+  return contrary
 }
+
+compareSolutions(sentence0, sentence1)
