@@ -1,3 +1,5 @@
+const stats = require('stats-lite')
+
 async function compareSolutions (solution0, solution1) {
 	let matches = []
 	let data = []
@@ -79,4 +81,11 @@ function checkContrariness (solution) {
 		}
 	}
 	return contrary
+}
+
+async function voteAnalysis (votes) {
+	return {
+		mean: await stats.mean(votes),
+		mode: await stats.mode(votes)
+	}
 }
